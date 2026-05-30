@@ -1,4 +1,4 @@
-#hashdog
+# hashdog
 
 A fast, lightweight Python CLI tool to identify unknown password hashes, encodings, and tokens. Built as p>
 
