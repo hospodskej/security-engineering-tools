@@ -6,18 +6,19 @@ import (
 	"sort"
 	"time"
 	"os"
+	"sync"
 
 	"github.com/pterm/pterm"
 )
 
-func worker(ports, results chan int, target string) {
+func worker(ports, results chan int, target string, wg *sync.WaitGroup) {
+	defer wg.Done()
 	for p := range ports {
 		fmt.Printf("Checked port: %d\n", p) //QA
 
 		address := fmt.Sprintf("%s:%d", target, p)
 		conn, err := net.DialTimeout("tcp", address, 1*time.Second)
 		if err != nil {
-			results <- 0
 			continue
 		}
 		conn.Close()
@@ -26,6 +27,7 @@ func worker(ports, results chan int, target string) {
 }
 
 func main() {
+	var wg sync.WaitGroup
 	if len(os.Args) < 2 {
 		pterm.FgRed.Printf("Usage: ./mantis <IP or Domain>")
 		return
@@ -49,24 +51,26 @@ func main() {
 	var openports []int
 
 	for i := 0; i < cap(ports); i++ {
-		go worker(ports, results, target)
+		wg.Add(1)
+		go worker(ports, results, target, &wg)
 	}
 
 	go func() {
-		for i := 1; i <= 1024; i++ {
-			ports <- i
-		}
+		wg.Wait()
+		close(results)
 	}()
 
-	for i := 0; i < 1024; i++ {
-		port := <- results
-		if port != 0 {
-			openports = append(openports, port)
+	go func() {
+		for i := 1; i <= 65535; i++ {
+			ports <- i
 		}
+		close(ports)
+	}()
+
+	for port := range results {
+		openports = append(openports, port)
 	}
 
-	close(ports)
-	close(results)
 	fmt.Println("--------------------------------")
 
 	if len(openports) == 0 {
@@ -74,7 +78,8 @@ func main() {
 	} else {
 		sort.Ints(openports)
 		for _, port := range openports {
-			fmt.Printf("%d open\n", port)
+			coloredPort := pterm.FgCyan.Sprintf("%d", port)
+			fmt.Printf("%s open\n", coloredPort)
 		}
 	}
 }
