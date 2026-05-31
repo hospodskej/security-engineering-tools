@@ -5,14 +5,16 @@ import (
 	"net"
 	"sort"
 	"time"
+	"os"
 
 	"github.com/pterm/pterm"
 )
 
-func worker(ports, results chan int) {
+func worker(ports, results chan int, target string) {
 	for p := range ports {
 		fmt.Printf("Checked port: %d\n", p) //QA
-		address := fmt.Sprintf("scanme.nmap.org:%d", p)
+
+		address := fmt.Sprintf("%s:%d", target, p)
 		conn, err := net.DialTimeout("tcp", address, 1*time.Second)
 		if err != nil {
 			results <- 0
@@ -24,6 +26,13 @@ func worker(ports, results chan int) {
 }
 
 func main() {
+	if len(os.Args) < 2 {
+		pterm.FgRed.Printf("Usage: ./mantis <IP or Domain>")
+		return
+	}
+
+	target := os.Args[1]
+
 	var workers int
 	for {
 		pterm.FgCyan.Printf("How many workers would you like to use?\n")
@@ -40,7 +49,7 @@ func main() {
 	var openports []int
 
 	for i := 0; i < cap(ports); i++ {
-		go worker(ports, results)
+		go worker(ports, results, target)
 	}
 
 	go func() {
