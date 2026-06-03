@@ -1,6 +1,6 @@
 # hashdog
 
-A fast, lightweight Python CLI tool to identify unknown password hashes, encodings, and tokens. Built as part of my 30-Days-30-Tools challenge.
+A fast, lightweight Python CLI tool to identify unknown password hashes, encodings, and tokens.
 
 ## Features
 * Identifies hashes based on structural prefixes, character sets, and exact string lengths.
