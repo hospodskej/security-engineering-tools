@@ -1,6 +1,6 @@
 # mantis
 
-A Go CLI tool to concurrently scan and identify open TCP ports. Created as part of my 30-Days-30-Tools challenge
+A Go CLI tool to concurrently scan and identify open TCP ports. 
 
 ## Features
 - **Concurrent Scanning:** Utilizes a dynamic worker pool to rapidly scan targets, drastically reducing scan times.
