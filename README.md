@@ -1,6 +1,6 @@
 # kiwi
 
-A Go CLI tool to scan and grade HTTP security headers. Created as part of my 30-Days-30-Tools challenge.
+A Go CLI tool to scan and grade HTTP security headers.
 
 ## Features
 * **Automated Scanning:** Quickly analyzes target URLs for critical security headers (CSP, HSTS, X-Frame-Options, etc.).
